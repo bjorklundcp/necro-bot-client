@@ -1,1 +1,1 @@
-# reddit-notify
+# necro-bot

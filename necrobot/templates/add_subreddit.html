@@ -1,0 +1,10 @@
+{% from "_formhelper.html" import render_field %}
+<form method=post action="/add_subreddit">
+  <dl>
+    {{ render_field(form.email_address) }}
+    {{ render_field(form.subreddit) }}
+    {{ render_field(form.key_word) }}
+  </dl>
+  <p><input type=submit value=Submit>
+</form>
+

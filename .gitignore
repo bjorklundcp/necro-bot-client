@@ -1,0 +1,17 @@
+# EMACS
+[#]*[#]
+.\#*
+
+# Compiled source #
+###################
+*.pyc
+
+# Mac #
+########
+._*
+*.DS_Store
+
+# Mac #
+########
+secrets.json
+
