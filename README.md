@@ -1,1 +1,1 @@
-# necro-bot
+# necro-bot-client
