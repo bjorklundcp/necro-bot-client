@@ -27,7 +27,7 @@ def add_subreddit():
         mongo_db = mongo_client.test
         mongo_collection = mongo_db.test_collection
 
-        existing_entry = mongo_collection.find({"email": email_address}).count()
+        entry_count = mongo_collection.find({"email": email_address}).count()
         if entry_count == 0:
             mongo_collection.insert_one(
                 {
