@@ -3,11 +3,58 @@ import requests
 
 from flask import Flask, request, flash, url_for, render_template, redirect
 from wtforms import Form, StringField, validators
+from pymongo import MongoClient
 
 from necrobot import app
 
 
 USER_AGENT = "NecroBot/1.0 by necrophobia155"
+
+
+@app.route('/')
+def index():
+    return 'Hello, World!'
+
+
+@app.route('/add_subreddit', methods=['GET', 'POST'])
+def add_subreddit():
+    form = AddSubredditForm(request.form)
+    if request.method == 'POST' and form.validate():
+        email_address= form.email_address.data
+        subreddit = 'https://reddit.com/r/{}/'.format(form.subreddit.data)
+        key_word = form.key_word.data
+        mongo_client = MongoClient()
+        mongo_db = mongo_client.test
+        mongo_collection = mongo_db.test_collection
+
+        existing_entry = mongo_collection.find({"email": email_address}).count()
+        if entry_count == 0:
+            mongo_collection.insert_one(
+                {
+                    "email": email_address,
+                    "subreddits": [
+                        subreddit
+                    ],
+                    "key_words": [
+                        key_word
+                    ]
+                }
+            )
+            flash('Thanks for the submission!')
+        elif entry_count < 5:
+            mongo_collection.update_one(
+                { "email": email_address },
+                { "$push": { "subreddits":subreddit, "key_words":keyword } }
+            )
+            flash('Thanks for the submission!')
+        else:
+            flash('Only 5 submissions per email please.')
+
+        mongo_client.close()
+
+        return redirect(url_for('index'))
+
+    return render_template('add_subreddit.html', form=form)
 
 
 class AddSubredditForm(Form):
@@ -23,24 +70,6 @@ class AddSubredditForm(Form):
         validators.Length(max=120, message="Key words cannot be longer than a tweet."),
         validators.DataRequired()
     ])
-
-
-@app.route('/')
-def index():
-    return 'Hello, World!'
-
-
-@app.route('/add_subreddit', methods=['GET', 'POST'])
-def add_subreddit():
-    form = AddSubredditForm(request.form)
-    if request.method == 'POST' and form.validate():
-        email_address= form.email_address.data
-        subreddit = 'https://reddit.com/r/{}/new/.json'.format(form.subreddit.data)
-        key_word = form.key_word.data
-        flash('Thanks for the submission')
-        return redirect(url_for('index'))
-
-    return render_template('add_subreddit.html', form=form)
 
 
 def get_access_token():
