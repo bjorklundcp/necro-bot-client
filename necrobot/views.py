@@ -1,14 +1,8 @@
-import json
-import requests
-
 from flask import Flask, request, flash, url_for, render_template, redirect
 from wtforms import Form, StringField, validators
 from pymongo import MongoClient
 
 from necrobot import app
-
-
-USER_AGENT = "NecroBot/1.0 by necrophobia155"
 
 
 @app.route('/')
@@ -70,22 +64,4 @@ class AddSubredditForm(Form):
         validators.Length(max=120, message="Key words cannot be longer than a tweet."),
         validators.DataRequired()
     ])
-
-
-def get_access_token():
-    with open('secrets.json', 'r') as file:
-        secrets = json.load(file)
-
-    client_auth = requests.auth.HTTPBasicAuth(secrets.get('api_id'), secrets.get('api_secret'))
-    post_data = {"grant_type": "password", "username": secrets.get('user'), "password": secrets.get('password')}
-    headers = {"User-Agent": USER_AGENT}
-    response = requests.post("https://www.reddit.com/api/v1/access_token", auth=client_auth, data=post_data, headers=headers)
-    return response.json().get('access_token')
-
-
-def get_data(endpoint, args=None):
-    access_token = get_access_token()
-    headers = {"Authorization": "bearer {}".format(access_token), "User-Agent": USER_AGENT}
-    response = requests.get(endpoint, params=args, headers=headers)
-    return response.json().get('data')
 
